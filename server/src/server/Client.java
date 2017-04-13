@@ -33,6 +33,8 @@ public class Client
             
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            output.println("Hello, server!");
              
             //This will wait for the server to send the string to the client saying a connection
             //has been made.
@@ -40,12 +42,16 @@ public class Client
             System.out.println(inputString);
             //Again, here is the code that will run the client, this will continue looking for 
             //input from the user then it will send that info to the server.
-            while(true) {
+            String userInput = "";
+            while(!userInput.equals("stop")) {
                 //Here we look for input from the user
-                String userInput = scanner.nextLine();
+                 userInput = scanner.nextLine();
                 //Now we write it to the server
                 output.println(userInput);
             }
+            output.println("Bye, server!");
+//            input.close();
+            output.close();
         } catch (IOException exception) {
             System.out.println("Error: " + exception);
         }
