@@ -72,6 +72,10 @@ public class Frame extends JFrame {
 				dtm.addRow(data);
 
 			} else if (event.getActionCommand() == "Download") {
+				int column = 0;
+				int row = table.getSelectedRow();
+				String value = table.getModel().getValueAt(row, column).toString();
+				System.out.println(value);
 			}
 		}
 	}
