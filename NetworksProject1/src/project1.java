@@ -5,7 +5,7 @@ public class project1 {
 		
 		Frame frame = new Frame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(300, 400);
+		frame.setSize(500, 600);
 		frame.setVisible(true);
 		
 	}
