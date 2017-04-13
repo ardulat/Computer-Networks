@@ -17,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
 public class Frame extends JFrame {
 
 	private JTextField textField;
+	private JButton uploadButton;
 	private JButton searchButton;
 	private JButton downloadButton;
 	private Object[][] data;
@@ -26,6 +27,8 @@ public class Frame extends JFrame {
 	public Frame() {
 		super("Project 1");
 		setLayout(new FlowLayout());
+		uploadButton = new JButton("Upload");
+		add(uploadButton, BorderLayout.CENTER);
 		textField = new JTextField("What are you searching for?", 20);
 		textField.setFont(new Font("Serif", Font.PLAIN, 14));
 		add(textField); // add textField to JFrame
@@ -78,6 +81,8 @@ public class Frame extends JFrame {
 					String value = table.getModel().getValueAt(row, column).toString();
 					System.out.println(value);
 				}
+			} else if (event.getActionCommand() == "Upload") {
+				
 			}
 		}
 	}
