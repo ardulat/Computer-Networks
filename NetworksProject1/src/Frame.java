@@ -17,15 +17,17 @@ import javax.swing.table.DefaultTableModel;
 public class Frame extends JFrame {
 
 	private JTextField textField;
+	private JButton uploadButton;
 	private JButton searchButton;
 	private JButton downloadButton;
-	private Object[][] data;
 	private JTable table;
 	DefaultTableModel dtm;
 
 	public Frame() {
 		super("Project 1");
 		setLayout(new FlowLayout());
+		uploadButton = new JButton("Upload");
+		add(uploadButton, BorderLayout.CENTER);
 		textField = new JTextField("What are you searching for?", 20);
 		textField.setFont(new Font("Serif", Font.PLAIN, 14));
 		add(textField); // add textField to JFrame
@@ -45,9 +47,9 @@ public class Frame extends JFrame {
 		table.setModel(dtm);
 
 		// add row dynamically into the table
-		for (int count = 1; count <= 30; count++) {
-			dtm.addRow(new Object[] { "data", "data", "data" });
-		}
+		
+			dtm.addRow(new Object[] { "", "", "" });
+		
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane, BorderLayout.CENTER);
 
@@ -61,17 +63,31 @@ public class Frame extends JFrame {
 
 	private class ButtonHandler implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
-			
+			//action for Search button
 			if (event.getActionCommand() == "Search") {
 				//clear table, don't need anything to mess there
 				int rowCount = dtm.getRowCount();
 				for (int i = rowCount - 1; i >= 0; i--) {
 					dtm.removeRow(i);
 				}
+				
+				//adding row
 				Object[] data = {textField.getText(), "14/02", "15kb"}; 
 				dtm.addRow(data);
 
-			} else if (event.getActionCommand() == "Download") {
+			} //action for Download button
+			else if (event.getActionCommand() == "Download") {
+				
+				//when we choose a row
+				int column = 0;
+				int row = table.getSelectedRow();
+				if (row > -1) {
+					String value = table.getModel().getValueAt(row, column).toString();
+					System.out.println(value);
+				}
+			} //action for Upload button 
+			else if (event.getActionCommand() == "Upload") {
+				
 			}
 		}
 	}
