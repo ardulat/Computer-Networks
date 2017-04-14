@@ -68,14 +68,21 @@ public class Server
                 //Create the streams
                 PrintWriter output = new PrintWriter(threadSocket.getOutputStream(), true);
                 BufferedReader input = new BufferedReader(new InputStreamReader(threadSocket.getInputStream()));
+                System.out.println("New client arrived");
                  
                 //Tell the client that he/she has connected
+                output.println("Hi, client!");
                 output.println("You have connected at: " + new Date());
                  
                 while (true) {
                     //This will wait until a line of text has been sent
                     String chatInput = input.readLine();
+                    
                     System.out.println(chatInput);
+                    
+                    if (chatInput.equals("Hello")) {
+                        output.println("Hi");
+                    }
                 }
             } catch(IOException exception) {
                 System.out.println("Error: " + exception);
