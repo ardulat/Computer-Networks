@@ -211,6 +211,7 @@ public class Frame extends JFrame {
                     System.out.println("..ok"); 
                     dout.flush(); 
                 }  
+                dout.writeUTF("stop");  
                 System.out.println("Send Complete");
                 dout.flush();  
             }
@@ -231,6 +232,7 @@ public class Frame extends JFrame {
 	        DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
 	        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
 
+	        System.out.println("Send Get to start...");
 	        String filename="";  
 	        try{
 
@@ -238,7 +240,7 @@ public class Frame extends JFrame {
 	            System.out.println("Receving file: "+filename);
 	            filename="client_"+filename;
 	            System.out.println("Saving as file: "+filename);
-	       
+	        //
 	            long sz=Long.parseLong(din.readUTF());
 	            System.out.println ("File Size: "+(sz/(1024*1024))+" MB");
 
