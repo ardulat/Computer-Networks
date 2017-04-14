@@ -116,10 +116,8 @@ public class Frame extends JFrame {
 				    	size = file.length() / 1024;
 				    	fileSize = size + "KB";
 				    }
-				    data.add(new Object[] {fileSize, lastModified, fileSize});
-				    for (int i = 0; i < data.size(); i++) {
-				    	dtm.addRow(data.get(i));
-				    }
+				    data.add(new Object[] {fileName, lastModified, fileSize});
+				    dtm.addRow(data.get(data.size()-1));
 				} else {
 				    //User did not choose a valid file
 					System.out.println("Upload canceled.");
