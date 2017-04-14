@@ -3,7 +3,13 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,11 +124,39 @@ public class Frame extends JFrame {
 				    }
 				    data.add(new Object[] {fileName, lastModified, fileSize});
 				    dtm.addRow(data.get(data.size()-1));
+				    
+				    startServer();
+				    
 				} else {
 				    //User did not choose a valid file
 					System.out.println("Upload canceled.");
 				}
 			}
+		}
+		public void startServer() {
+			//We need a try-catch because lots of errors can be thrown
+	        try {
+	            ServerSocket sSocket = new ServerSocket(5000);
+	            System.out.println("Server started at: " + new Date());
+	             
+	            
+	            //Loop that runs server functions
+	            while(true) {
+	                //Wait for a client to connect
+	                Socket socket = sSocket.accept();
+	             
+	             
+	                 
+	                //Create a new custom thread to handle the connection
+	                ClientThread cT = new ClientThread(socket);
+	                 
+	                //Start the thread!
+	                new Thread(cT).start();
+	                 
+	            }
+	        } catch(IOException exception) {
+	            System.out.println("Error: " + exception);
+	        }
 		}
 	}
 }
