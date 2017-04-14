@@ -7,7 +7,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -45,7 +47,7 @@ public class Frame extends JFrame {
 		dtm = new DefaultTableModel(0, 0);
 
 		// add header of the table
-		String header[] = new String[] { "Name", "Last Modified", "Size" };
+		String header[] = new String[] { "Name", "Format", "Last Modified", "Size" };
 
 		// add header in table model
 		dtm.setColumnIdentifiers(header);
@@ -53,7 +55,7 @@ public class Frame extends JFrame {
 		table.setModel(dtm);
 
 		// add row dynamically into the table
-		dtm.addRow(new Object[] {"", "", ""});
+		dtm.addRow(new Object[] {"", "", "", ""});
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane, BorderLayout.CENTER);
@@ -129,7 +131,20 @@ public class Frame extends JFrame {
 				    	size = file.length() / 1024;
 				    	fileSize = size + "KB";
 				    }
-				    data.add(new Object[] {fileName, lastModified, fileSize});
+				    //getting format of the file
+				   
+				    String format = "";
+				    char[] nameChar = fileName.toCharArray();
+				    Stack<Character> myStack = new Stack();
+				    for (int j = nameChar.length - 1; j >= 0; j--) {
+				    	if (nameChar[j] == '.') {break;}
+				    	myStack.push(nameChar[j]);
+				    	
+				    }
+				    while(myStack.size() > 0) {
+				    	format += myStack.pop();
+				    }
+				    data.add(new Object[] {fileName, format.toUpperCase(), lastModified, fileSize});
 				    dtm.addRow(data.get(data.size()-1));
 				} else {
 				    //User did not choose a valid file
