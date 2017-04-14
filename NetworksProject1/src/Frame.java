@@ -87,7 +87,7 @@ public class Frame extends JFrame {
 				}
 			} //action for Upload button 
 			else if (event.getActionCommand() == "Upload") {
-				
+				System.out.println("Upload");
 			}
 		}
 	}
