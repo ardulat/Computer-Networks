@@ -3,10 +3,14 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -22,6 +26,8 @@ public class Frame extends JFrame {
 	private JButton downloadButton;
 	private JTable table;
 	DefaultTableModel dtm;
+	
+	ArrayList<Object[]> data = new ArrayList<Object[]>();
 
 	public Frame() {
 		super("Project 1");
@@ -47,8 +53,7 @@ public class Frame extends JFrame {
 		table.setModel(dtm);
 
 		// add row dynamically into the table
-		
-			dtm.addRow(new Object[] { "", "", "" });
+		dtm.addRow(new Object[] {"", "", ""});
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane, BorderLayout.CENTER);
@@ -59,6 +64,7 @@ public class Frame extends JFrame {
 		ButtonHandler handler = new ButtonHandler();
 		searchButton.addActionListener(handler);
 		downloadButton.addActionListener(handler);
+		uploadButton.addActionListener(handler);
 	}
 
 	private class ButtonHandler implements ActionListener {
@@ -77,6 +83,7 @@ public class Frame extends JFrame {
 
 			} //action for Download button
 			else if (event.getActionCommand() == "Download") {
+				System.out.println("Download pressed.");
 				
 				//when we choose a row
 				int column = 0;
@@ -87,7 +94,34 @@ public class Frame extends JFrame {
 				}
 			} //action for Upload button 
 			else if (event.getActionCommand() == "Upload") {
-				System.out.println("Upload");
+				System.out.println("Upload pressed.");
+				
+				JFileChooser fc = new JFileChooser();
+				int returnVal = fc.showOpenDialog(Frame.this); //Where frame is the parent component
+
+				File file = null;
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+				    file = fc.getSelectedFile();
+				    //Now you have your file to do whatever you want to do
+				    String fileName = file.getName();
+				    System.out.println("Filename: " + fileName);
+				    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				    String lastModified = sdf.format(file.lastModified());
+				    System.out.println("Date modified: " + lastModified);
+				    float size = file.length() / (1024*1024);
+				    String fileSize = "";
+				    if (size != 0) {
+				    	fileSize = size + "MB";
+				    } else {
+				    	size = file.length() / 1024;
+				    	fileSize = size + "KB";
+				    }
+				    data.add(new Object[] {fileName, lastModified, fileSize});
+				    dtm.addRow(data.get(data.size()-1));
+				} else {
+				    //User did not choose a valid file
+					System.out.println("Upload canceled.");
+				}
 			}
 		}
 	}
