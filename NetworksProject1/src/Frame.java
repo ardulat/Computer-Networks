@@ -4,7 +4,12 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -97,10 +102,6 @@ public class Frame extends JFrame {
 					}
 					
 				}
-				
-				//adding row
-				//Object[] data = {textField.getText(), "14/02", "15kb"}; 
-				//dtm.addRow(data);
 
 			} //action for Download button
 			else if (event.getActionCommand() == "Download") {
@@ -110,8 +111,15 @@ public class Frame extends JFrame {
 				int column = 0;
 				int row = table.getSelectedRow();
 				if (row > -1) {
-					String value = table.getModel().getValueAt(row, column).toString();
-					System.out.println(value);
+					String name = table.getModel().getValueAt(row, column).toString();
+					System.out.println("The name of the file is = " + name);
+					try {
+						sendData(name);
+						System.out.println("Data is sent.");
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println("Error!");
+					}
 				}
 			} //action for Upload button 
 			else if (event.getActionCommand() == "Upload") {
@@ -126,7 +134,7 @@ public class Frame extends JFrame {
 				    //Now you have your file to do whatever you want to do
 				    String fileName = file.getName();
 				    System.out.println("Filename: " + fileName);
-				    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 				    String lastModified = sdf.format(file.lastModified());
 				    System.out.println("Date modified: " + lastModified);
 				    float size = file.length() / (1024*1024);
@@ -150,40 +158,107 @@ public class Frame extends JFrame {
 				    while(myStack.size() > 0) {
 				    	format += myStack.pop();
 				    }
+				    if (data.size() == 0) {
+				    	dtm.removeRow(0);
+				    }
 				    data.add(new Object[] {fileName, format.toUpperCase(), lastModified, fileSize});
 				    dtm.addRow(data.get(data.size()-1));
-				    
-				    startServer();
-				    
 				} else {
 				    //User did not choose a valid file
 					System.out.println("Upload canceled.");
 				}
 			}
 		}
-		public void startServer() {
-			//We need a try-catch because lots of errors can be thrown
-	        try {
-	            ServerSocket sSocket = new ServerSocket(5000);
-	            System.out.println("Server started at: " + new Date());
-	             
-	            
-	            //Loop that runs server functions
-	            while(true) {
-	                //Wait for a client to connect
-	                Socket socket = sSocket.accept();
-	             
-	             
-	                 
-	                //Create a new custom thread to handle the connection
-	                ClientThread cT = new ClientThread(socket);
-	                 
-	                //Start the thread!
-	                new Thread(cT).start();
-	                 
-	            }
-	        } catch(IOException exception) {
-	            System.out.println("Error: " + exception);
+		public void sendData(String filename) throws Exception {
+            //create server socket on port 15123
+            ServerSocket ss=new ServerSocket(15123); 
+            System.out.println ("Waiting for request");	
+            receiveData();
+            Socket s=ss.accept();  
+            System.out.println ("Connected With "+s.getInetAddress().toString());
+            DataInputStream din=new DataInputStream(s.getInputStream());  
+            DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
+            try{
+            	
+                System.out.println("SendGet....Ok");
+
+                if(true){  
+
+                    System.out.println("Sending File: "+filename);
+                    dout.writeUTF(filename);
+                    dout.flush();  
+
+                    File f=new File(filename);
+                    FileInputStream fin=new FileInputStream(f);
+                    long sz=(int) f.length();
+
+                    byte b[]=new byte [1024];
+
+                    int read;
+
+                    dout.writeUTF(Long.toString(sz)); 
+                    dout.flush(); 
+
+                    System.out.println ("Size: "+sz);
+                    System.out.println ("Buf size: "+ss.getReceiveBufferSize());
+
+                    while((read = fin.read(b)) != -1){
+                        dout.write(b, 0, read); 
+                        dout.flush(); 
+                    }
+                    fin.close();
+
+                    System.out.println("..ok"); 
+                    dout.flush(); 
+                }  
+                System.out.println("Send Complete");
+                dout.flush();  
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+                System.out.println("An error occured");
+            }
+            din.close();  
+            s.close();  
+            ss.close();  
+		}
+		
+		public void receiveData() throws Exception {
+			String address = "localhost";
+	        //create the socket on port 15123
+	        Socket s=new Socket(address,15123);  
+	        DataInputStream din=new DataInputStream(s.getInputStream());  
+	        DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
+	        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
+
+	        String filename="";  
+	        try{
+
+	            filename=din.readUTF();     
+	            System.out.println("Receving file: "+filename);
+	            filename="client_"+filename;
+	            System.out.println("Saving as file: "+filename);
+	       
+	            long sz=Long.parseLong(din.readUTF());
+	            System.out.println ("File Size: "+(sz/(1024*1024))+" MB");
+
+	            byte b[]=new byte [1024];
+	            System.out.println("Receving file..");
+	            FileOutputStream fos=new FileOutputStream(new File(filename),true);
+	            long bytesRead;
+	            do {
+	                bytesRead = din.read(b, 0, b.length);
+	                fos.write(b,0,b.length);
+	            } while(!(bytesRead<1024));
+
+	            System.out.println("Completed");
+	            fos.close(); 
+	            dout.close();  	
+	            s.close();  
+	        }
+	        catch(EOFException e) {
+	        	e.printStackTrace();
+                System.out.println("An error occured");
 	        }
 		}
 	}
