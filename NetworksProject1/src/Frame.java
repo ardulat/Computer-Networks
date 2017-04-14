@@ -77,9 +77,22 @@ public class Frame extends JFrame {
 					dtm.removeRow(i);
 				}
 				
+				String value;
+				Object[] row;
+				for (int i = 0; i < data.size(); i++) {
+					
+					row = data.get(i);
+					value = (String) row[0];
+					
+					if(value.contains(textField.getText())) {
+						dtm.addRow(row);
+					}
+					
+				}
+				
 				//adding row
-				Object[] data = {textField.getText(), "14/02", "15kb"}; 
-				dtm.addRow(data);
+				//Object[] data = {textField.getText(), "14/02", "15kb"}; 
+				//dtm.addRow(data);
 
 			} //action for Download button
 			else if (event.getActionCommand() == "Download") {
