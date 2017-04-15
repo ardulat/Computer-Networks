@@ -31,7 +31,6 @@ public class FailMailTracker extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("Server has been created.");
 		try {
 			address = socket.getLocalAddress().toString();
 			System.out.println(socket.getLocalPort());
@@ -43,15 +42,14 @@ public class FailMailTracker extends Thread {
             
             while(true) {
             	try{
-//            		System.out.println("Check");
             		received = inputStream.readLine();
             		System.out.println(received);
-            		System.out.println("Check");
+            		System.out.println("saipal");
             		message = received.split("\\s", 3); // split by space (\\s) and limit is 3
             		// Authentication
             		if (received.equals("Hi, server!")) {
             			System.out.println("Connection established.");
-            			response = "Hello, client!";
+            			response = "Hello, client!\n";
             			outputStream.write(response.getBytes());
             			outputStream.flush();
             		}
@@ -60,14 +58,43 @@ public class FailMailTracker extends Thread {
             			port = message[1];
             			String json = message[2];
             			ArrayList<Data> retrieved = retrieveData(json);
-            			for (int i = 0; i < retrieved.size(); i++) {
-            			    data.add(i+data.size()-1, retrieved.get(i)); 
-            			}
-            			System.out.println(data);
             			
+            			for (int i = 0; i < retrieved.size(); i++) {
+            			    data.add(retrieved.get(i)); 
+            			}
             		}
             		else if (message[0].equals("Search:")) {
             			
+            			if (message.length > 1) { // "Search: filename" typed - OK
+            				
+            				String filename = message[1];
+            				System.out.println("Searching a file " + filename);
+            				
+            				int fileCount = 0;
+            				for (int i = 0; i < data.size(); i++) {
+            					if (!port.equals(data.get(i).getPort())
+            						&& (filename.contains(data.get(i).getFilename()))
+            						|| data.get(i).getFilename().contains(filename)) {
+            						fileCount++;
+            						response = response + data.get(i).toString() + "\n"; 
+            					}
+            				}
+            				
+            				// Saying how many files have been found
+            				System.out.println(fileCount + "files found:");
+            				System.out.println(response);
+            				
+            				String numberOfFiles = fileCount + "\n";
+            				outputStream.write(numberOfFiles.getBytes());
+            				
+            				// Sending files
+            				if (fileCount != 0) {
+            					System.out.println("Sending file attributes to server...");
+            					outputStream.write(response.getBytes());
+            				}
+            			} else { // "Search: " typed - Error 
+            				System.out.println("Please provide a filename you are searching for");
+            			}
             		}
             		else if (received.equals("Bye, server!")) {
             			response = "Goodbye, client!";
@@ -84,7 +111,13 @@ public class FailMailTracker extends Thread {
             		System.out.println(e);
             		
             		// Delete client's tuples
-            		
+            		for (int i = 0; i < data.size(); i++) {
+                        if (data.get(i).getPort().equals(port)) {
+                            data.remove(i);
+                            i--;
+                        }
+                    }
+                    break;
             	}
             }
 		} catch (Exception e) {
@@ -126,4 +159,13 @@ public class FailMailTracker extends Thread {
 		
 		return dt;
 	}
+//	
+//	public boolean isPresent(Data u){
+//        for (int i = 0; i < data.size(); i++){
+//            if (data.get(i).getFilename().equals(u.getFilename())){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 }
