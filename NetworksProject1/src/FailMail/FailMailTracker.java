@@ -71,17 +71,19 @@ public class FailMailTracker extends Thread {
             				System.out.println("Searching a file " + filename);
             				
             				int fileCount = 0;
+            				response = "";
             				for (int i = 0; i < data.size(); i++) {
             					if (!port.equals(data.get(i).getPort())
             						&& (filename.contains(data.get(i).getFilename()))
             						|| data.get(i).getFilename().contains(filename)) {
             						fileCount++;
-            						response = response + data.get(i).toString() + "\n"; 
+            						response = response + data.get(i).toString() + "\n";
+            						System.out.println("Response: " + response);
             					}
             				}
             				
             				// Saying how many files have been found
-            				System.out.println(fileCount + "files found:");
+            				System.out.println(fileCount + " files found:");
             				System.out.println(response);
             				
             				String numberOfFiles = fileCount + "\n";
@@ -90,6 +92,7 @@ public class FailMailTracker extends Thread {
             				// Sending files
             				if (fileCount != 0) {
             					System.out.println("Sending file attributes to server...");
+            					System.out.println(response);
             					outputStream.write(response.getBytes());
             				}
             			} else { // "Search: " typed - Error 
@@ -97,7 +100,7 @@ public class FailMailTracker extends Thread {
             			}
             		}
             		else if (received.equals("Bye, server!")) {
-            			response = "Goodbye, client!";
+            			response = "Goodbye, client!\n";
             			outputStream.write(response.getBytes());
             			outputStream.flush();
             		}

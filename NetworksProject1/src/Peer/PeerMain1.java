@@ -29,7 +29,6 @@ public class PeerMain1 {
 		
 		// Generating sockets
 		Socket socket = new Socket("127.0.0.1", 15125);
-//		System.out.println(socket.getLocalPort());
 		DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 		BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		
@@ -37,7 +36,6 @@ public class PeerMain1 {
 		send = "Hi, server!\n";		
 		outputStream.write(send.getBytes());
 		outputStream.flush();
-		System.out.println(send);
 		received = inputStream.readLine();
 		System.out.println("Server says: " + received);
 		
@@ -78,11 +76,11 @@ public class PeerMain1 {
 		
 		// Request a file
 		while(true) {
-			
+			System.out.println();
 			System.out.println("Send a message to the server:");
 			send = buf.readLine();
 			message = send.split("\\s");
-			if (message.equals("Search:")) {
+			if (message[0].equals("Search:")) {
 				send = send + "\n";
 				outputStream.write(send.getBytes());
 				boolean used = false;
@@ -103,6 +101,7 @@ public class PeerMain1 {
 					String attr[] = received.split(", ");
 					String address = "127.0.0.1";
 					String filename = attr[0].substring(1);
+					System.out.println("File is = " + filename);
 					int filePort = Integer.parseInt(attr[5].substring(0, attr[5].length()-1));
 					
 					System.out.println("File "+filename+" found at address "+address+" on port "+port);
@@ -119,11 +118,12 @@ public class PeerMain1 {
 					
 					DataInputStream din = new DataInputStream(fileSocket.getInputStream());
 					String filenameReceived = din.readUTF();
-					System.out.println("Receiving " + filenameReceived);
+					System.out.println("Receiving file is " + filenameReceived);
 					long fileSize = Long.parseLong(din.readUTF());
 					System.out.println("File size is " + fileSize/1024 + "KB");
 					
 					byte b[] = new byte[1024];
+					System.out.println("Stop");
 					
 					filenameReceived = "received_" + filenameReceived;
 					System.out.println("Receiving a file " + filenameReceived);
@@ -145,6 +145,10 @@ public class PeerMain1 {
 				}
 			}
 			else if (send.equals("Bye, server!")) { // Say goodbye
+				send = send + "\n";
+				outputStream.write(send.getBytes());
+				received = inputStream.readLine();
+				System.out.println("Server says: " + received);
 				thread.disconnect();
 				serverSocket.close();
 				socket.close();
@@ -152,7 +156,7 @@ public class PeerMain1 {
 			}
 			else {
 				// Error message
-				System.out.println("Oops! I can't understand you.");
+				System.out.println("Oops! You are trying to send to a server wrong message.");
 			}
 		}
 	}

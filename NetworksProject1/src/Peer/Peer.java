@@ -31,7 +31,7 @@ public class Peer  extends Thread {
 				DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
 				
 				received = inputStream.readLine();
-				System.out.println("Check");
+				System.out.println(received);
 				message = received.split("\\s");
 				
 				if (message[0].equals("Download:")) {
@@ -40,7 +40,7 @@ public class Peer  extends Thread {
 					dout.writeUTF(filename);
 					dout.flush();
 					
-					File file = new File(System.getProperty("user.dir") + "/src/Client/" + filename);
+					File file = new File(System.getProperty("user.dir") + "/receivedFiles/" + filename);
                     FileInputStream fin = new FileInputStream(file);
                     long sz = (int) file.length();
 
