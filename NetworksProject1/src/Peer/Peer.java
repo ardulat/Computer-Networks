@@ -40,7 +40,7 @@ public class Peer  extends Thread {
 					dout.writeUTF(filename);
 					dout.flush();
 					
-					File file = new File(System.getProperty("user.dir") + "/receivedFiles/" + filename);
+					File file = new File(System.getProperty("user.dir") + "/sharedFiles/client1/" + filename);
                     FileInputStream fin = new FileInputStream(file);
                     long sz = (int) file.length();
 
