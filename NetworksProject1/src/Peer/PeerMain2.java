@@ -1,6 +1,7 @@
 package Peer;
 
-import Peer.Peer;
+import Peer.Peer1;
+import Crypto.CryptoUtils;
 
 import java.io.*;
 import java.net.*;
@@ -10,25 +11,27 @@ import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import Crypto.CryptoUtils;
+
 public class PeerMain2 {
 	
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws Exception {
 		
 		// Instances
 		String received;
 		String send;
 		String[] message;
 		JSONArray array = new JSONArray();
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		
 		// Connecting to port
 		int port = 15129;
 		ServerSocket serverSocket = new ServerSocket(port);
-		Peer thread = new Peer(serverSocket);
+		Peer1 thread = new Peer1(serverSocket);
 		thread.start();
 		
 		// Generating sockets
 		Socket socket = new Socket("127.0.0.1", 15125);
-//		System.out.println(socket.getLocalPort());
 		DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 		BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		
@@ -36,7 +39,6 @@ public class PeerMain2 {
 		send = "Hi, server!\n";		
 		outputStream.write(send.getBytes());
 		outputStream.flush();
-		System.out.println(send);
 		received = inputStream.readLine();
 		System.out.println("Server says: " + received);
 		
@@ -77,11 +79,11 @@ public class PeerMain2 {
 		
 		// Request a file
 		while(true) {
-			
+			System.out.println();
 			System.out.println("Send a message to the server:");
-			send = inputStream.readLine();
+			send = buf.readLine();
 			message = send.split("\\s");
-			if (message.equals("Search:")) {
+			if (message[0].equals("Search:")) {
 				send = send + "\n";
 				outputStream.write(send.getBytes());
 				boolean used = false;
@@ -102,6 +104,7 @@ public class PeerMain2 {
 					String attr[] = received.split(", ");
 					String address = "127.0.0.1";
 					String filename = attr[0].substring(1);
+					System.out.println("File is = " + filename);
 					int filePort = Integer.parseInt(attr[5].substring(0, attr[5].length()-1));
 					
 					System.out.println("File "+filename+" found at address "+address+" on port "+port);
@@ -118,7 +121,7 @@ public class PeerMain2 {
 					
 					DataInputStream din = new DataInputStream(fileSocket.getInputStream());
 					String filenameReceived = din.readUTF();
-					System.out.println("Receiving " + filenameReceived);
+					System.out.println("Receiving file is " + filenameReceived);
 					long fileSize = Long.parseLong(din.readUTF());
 					System.out.println("File size is " + fileSize/1024 + "KB");
 					
@@ -126,14 +129,18 @@ public class PeerMain2 {
 					
 					filenameReceived = "received_" + filenameReceived;
 					System.out.println("Receiving a file " + filenameReceived);
-					FileOutputStream fos = new FileOutputStream(new File(System.getProperty("user.dir")+
-																"/receivedFiles/" + filenameReceived), true);
+					File ff = new File(System.getProperty("user.dir")+
+							"/receivedFiles/" + filenameReceived);
+					FileOutputStream fos = new FileOutputStream(ff, true);
 					long bytesRead;
 					do {
 	                    bytesRead = din.read(b, 0, b.length);
 	                    fos.write(b, 0, b.length);
 	                } while (!(bytesRead < 1024));
 					
+//					String key = "we need A grades";
+//					CryptoUtils.decrypt(key, ff, ff);
+
 					System.out.println("Completed.");
 					fos.close();
 					din.close();
@@ -144,6 +151,10 @@ public class PeerMain2 {
 				}
 			}
 			else if (send.equals("Bye, server!")) { // Say goodbye
+				send = send + "\n";
+				outputStream.write(send.getBytes());
+				received = inputStream.readLine();
+				System.out.println("Server says: " + received);
 				thread.disconnect();
 				serverSocket.close();
 				socket.close();
@@ -151,7 +162,7 @@ public class PeerMain2 {
 			}
 			else {
 				// Error message
-				System.out.println("Oops! I can't understand you.");
+				System.out.println("Oops! You are trying to send to a server wrong message.");
 			}
 		}
 	}
