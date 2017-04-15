@@ -3,7 +3,9 @@ package Peer;
 import java.io.*;
 import java.net.*;
 
-public class Peer  extends Thread {
+import Crypto.CryptoUtils;
+
+public class Peer2  extends Thread {
 	
 	// Instances
 	ServerSocket serverSocket;
@@ -12,7 +14,7 @@ public class Peer  extends Thread {
 	String[] message;
 	
 	// Initializer
-	public Peer(ServerSocket serverSocket) {
+	public Peer2(ServerSocket serverSocket) {
 		this.serverSocket = serverSocket;
 		isOnline = true;
 	}
@@ -44,6 +46,13 @@ public class Peer  extends Thread {
                     FileInputStream fin = new FileInputStream(file);
                     long sz = (int) file.length();
 
+//                    String key = "we need A grades";
+//                    try {
+//                    	CryptoUtils.encrypt(key, file, file);
+//                    } catch (Exception e) {
+//                    	System.out.println("Error encrypting: " + e);
+//                    }
+                    
                     byte b[] = new byte [1024];
 
                     int read;

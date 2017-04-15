@@ -1,6 +1,6 @@
 package Peer;
 
-import Peer.Peer;
+import Peer.Peer1;
 
 import java.io.*;
 import java.net.*;
@@ -10,9 +10,11 @@ import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import Crypto.CryptoUtils;
+
 public class PeerMain1 {
 	
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws Exception {
 		
 		// Instances
 		String received;
@@ -24,7 +26,7 @@ public class PeerMain1 {
 		// Connecting to port
 		int port = 15127;
 		ServerSocket serverSocket = new ServerSocket(port);
-		Peer thread = new Peer(serverSocket);
+		Peer1 thread = new Peer1(serverSocket);
 		thread.start();
 		
 		// Generating sockets
@@ -123,18 +125,21 @@ public class PeerMain1 {
 					System.out.println("File size is " + fileSize/1024 + "KB");
 					
 					byte b[] = new byte[1024];
-					System.out.println("Stop");
 					
 					filenameReceived = "received_" + filenameReceived;
 					System.out.println("Receiving a file " + filenameReceived);
-					FileOutputStream fos = new FileOutputStream(new File(System.getProperty("user.dir")+
-																"/receivedFiles/" + filenameReceived), true);
+					File ff = new File(System.getProperty("user.dir")+
+							"/receivedFiles/" + filenameReceived);
+					FileOutputStream fos = new FileOutputStream(ff, true);
 					long bytesRead;
 					do {
 	                    bytesRead = din.read(b, 0, b.length);
 	                    fos.write(b, 0, b.length);
 	                } while (!(bytesRead < 1024));
 					
+//					String key = "we need A grades";
+//					CryptoUtils.decrypt(key, ff, ff);
+
 					System.out.println("Completed.");
 					fos.close();
 					din.close();
