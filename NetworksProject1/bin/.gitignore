@@ -1,11 +1,3 @@
-/Frame$ButtonHandler.class
-/Frame.class
-/project1.class
-/fa.class
-/Frame$ClientThread.class
-/Server.class
-/Server$ClientThread.class
-/ClientThread.class
-/Client.class
-/FailMailTracker.class
-/Data.class
+/Peer/
+/FailMail/
+/Model/
